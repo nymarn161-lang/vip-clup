@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=yes"/>
+<title>VIP Club — محتوى حصري للكبار | عرض لا يفوت</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --purple:#7c3aed;--cyan:#00d2ff;--red:#ff2d55;--gold:#ffd700;
+  --bg:#05050f;--card-bg:rgba(255,255,255,0.04);--border:rgba(124,58,237,0.35);
+}
+body{min-height:100vh;background:var(--bg);color:#fff;
+  font-family:'Segoe UI',Tahoma,Arial,sans-serif;overflow-x:hidden;position:relative}
+canvas#bg{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none}
+.page{position:relative;z-index:1}
+
+/* ── HEADER ── */
+header{
+  text-align:center;padding:2.5rem 1.5rem 1.5rem;
+  background:linear-gradient(180deg,rgba(124,58,237,0.15) 0%,transparent 100%);
+  border-bottom:1px solid var(--border);position:relative;overflow:hidden;
+}
+header::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse 70% 60% at 50% 0%,rgba(0,210,255,0.12),transparent);
+}
+.logo-icon{display:flex;align-items:center;justify-content:center;gap:.7rem;margin-bottom:1rem}
+.logo-icon svg{filter:drop-shadow(0 0 12px var(--red));animation:float 3s ease-in-out infinite}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+header h1{
+  font-size:clamp(1.5rem,4vw,2.5rem);font-weight:900;
+  background:linear-gradient(90deg,#fff,var(--red),var(--purple),var(--gold));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;background-size:200%;
+  animation:gradshift 4s linear infinite;
+}
+@keyframes gradshift{0%{background-position:0%}100%{background-position:200%}}
+header p{color:#94a3b8;margin-top:.5rem;font-size:.9rem}
+
+/* ── PRICE ── */
+.price-sec{text-align:center;padding:2rem 1rem 1rem}
+.old-price{font-size:1.2rem;color:#64748b;text-decoration:line-through}
+.new-price{
+  font-size:clamp(3.5rem,10vw,5.5rem);font-weight:900;
+  background:linear-gradient(90deg,var(--red),var(--gold));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;animation:glow-price 2s ease-in-out infinite alternate;
+  line-height:1;
+}
+@keyframes glow-price{from{filter:drop-shadow(0 0 20px rgba(255,45,85,.6))}to{filter:drop-shadow(0 0 40px rgba(255,45,85,.9))}}
+.price-note{color:var(--red);margin-top:.4rem;font-size:.9rem;font-weight:bold;animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.6}}
+
+/* ── COUNTDOWN ── */
+.countdown{display:flex;justify-content:center;gap:0.8rem;padding:1rem;flex-wrap:wrap}
+.cd-box{
+  min-width:70px;padding:0.8rem;text-align:center;
+  background:rgba(124,58,237,0.12);border:1px solid rgba(124,58,237,0.4);
+  border-radius:14px;position:relative;overflow:hidden;
+  box-shadow:0 0 20px rgba(124,58,237,0.15);
+}
+.cd-box::before{
+  content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;
+  background:conic-gradient(transparent,rgba(124,58,237,0.15),transparent 30%);
+  animation:spin-border 4s linear infinite;
+}
+@keyframes spin-border{to{transform:rotate(360deg)}}
+.cd-num{font-size:1.8rem;font-weight:800;color:var(--cyan);text-shadow:0 0 15px rgba(0,210,255,.8);position:relative;z-index:1}
+.cd-label{font-size:.7rem;color:#94a3b8;margin-top:.2rem;position:relative;z-index:1}
+
+/* ── FEATURES ── */
+.features{max-width:760px;margin:1.5rem auto;padding:0 1.2rem}
+.features h2{
+  text-align:center;font-size:1.2rem;margin-bottom:1.2rem;color:#e2e8f0;
+  display:flex;align-items:center;justify-content:center;gap:.6rem;
+}
+.features h2::before,.features h2::after{
+  content:'';flex:1;height:1px;
+  background:linear-gradient(90deg,transparent,var(--red),transparent);
+}
+.features-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:.8rem}
+.feat-card{
+  background:var(--card-bg);border:1px solid var(--border);border-radius:12px;
+  padding:0.8rem 1rem;display:flex;align-items:center;gap:.7rem;
+  cursor:default;transition:all .3s;position:relative;overflow:hidden;
+}
+.feat-card::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,transparent,rgba(124,58,237,0.06));
+  opacity:0;transition:opacity .3s;
+}
+.feat-card:hover{border-color:var(--red);transform:translateX(-3px) scale(1.01);
+  box-shadow:0 0 20px rgba(255,45,85,0.15)}
+.feat-card:hover::before{opacity:1}
+.feat-icon{
+  width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(135deg,var(--red),#c0392b);flex-shrink:0;
+  box-shadow:0 0 12px rgba(255,45,85,0.4);
+}
+.feat-icon svg{width:20px;height:20px;fill:none;stroke:#fff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.feat-label{font-size:.85rem;font-weight:600;color:#e2e8f0}
+.feat-sub{font-size:.7rem;color:#64748b;margin-top:.1rem}
+
+/* ── CTA ── */
+.cta-sec{text-align:center;padding:2rem 1rem}
+.cta-btn{
+  display:inline-flex;align-items:center;gap:.6rem;
+  background:linear-gradient(135deg,var(--red),#c0392b);
+  color:#fff;border:none;border-radius:50px;padding:0.9rem 2.5rem;
+  font-size:1rem;font-weight:700;cursor:pointer;text-decoration:none;
+  position:relative;overflow:hidden;transition:transform .2s;
+  box-shadow:0 0 30px rgba(255,45,85,0.5);animation:pulse-btn 2.5s ease-in-out infinite;
+}
+.cta-btn::before{
+  content:'';position:absolute;top:-50%;left:-100%;width:60%;height:200%;
+  background:rgba(255,255,255,.15);transform:skewX(-20deg);
+  animation:shine 3s ease-in-out infinite;
+}
+@keyframes shine{0%,100%{left:-100%}50%{left:150%}}
+@keyframes pulse-btn{
+  0%,100%{box-shadow:0 0 25px rgba(255,45,85,.5)}
+  50%{box-shadow:0 0 45px rgba(255,45,85,.8),0 0 60px rgba(0,210,255,.2)}
+}
+.cta-btn:hover{transform:scale(1.05)}
+.cta-btn svg{width:18px;height:18px;fill:none;stroke:#fff;stroke-width:2.5}
+
+/* ── BADGES ── */
+.badges{display:flex;justify-content:center;gap:0.8rem;flex-wrap:wrap;padding:.5rem 1rem 1.5rem}
+.badge{
+  display:flex;align-items:center;gap:.4rem;
+  background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);
+  border-radius:8px;padding:.4rem .8rem;font-size:.75rem;color:#94a3b8;
+}
+.badge svg{width:14px;height:14px;fill:none;stroke:var(--red);stroke-width:2}
+
+/* ── TESTIMONIALS ── */
+.testimonials{max-width:940px;margin:1rem auto 2rem;padding:0 1.2rem}
+.testimonials h2{
+  text-align:center;font-size:1.2rem;margin-bottom:1.2rem;color:#e2e8f0;
+  display:flex;align-items:center;justify-content:center;gap:.6rem;
+}
+.testimonials h2::before,.testimonials h2::after{
+  content:'';flex:1;height:1px;
+  background:linear-gradient(90deg,transparent,var(--gold),transparent);
+}
+.test-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:0.8rem}
+.test-card{
+  background:rgba(255,255,255,.04);border:1px solid rgba(255,215,0,.15);
+  border-radius:14px;padding:1rem;position:relative;overflow:hidden;
+  transition:all .3s;
+}
+.test-card:hover{border-color:rgba(255,215,0,.35);box-shadow:0 0 15px rgba(255,215,0,.1)}
+.test-card::before{
+  content:'❝';position:absolute;top:-10px;right:10px;
+  font-size:4rem;color:rgba(255,215,0,.06);font-family:serif;
+}
+.stars{display:flex;gap:2px;margin-bottom:.5rem}
+.stars svg{width:12px;height:12px;fill:var(--gold);stroke:none}
+.test-text{color:#cbd5e1;font-size:.85rem;line-height:1.6;margin-bottom:.6rem}
+.test-name{color:var(--gold);font-weight:700;font-size:.78rem;display:flex;align-items:center;gap:.3rem}
+.test-name svg{width:12px;height:12px;fill:none;stroke:var(--gold);stroke-width:2}
+
+/* ── FOOTER ── */
+footer{
+  text-align:center;padding:1rem;background:rgba(0,0,0,.4);
+  border-top:1px solid var(--border);color:#475569;font-size:.7rem;
+  display:flex;align-items:center;justify-content:center;gap:.4rem;
+  flex-wrap:wrap;
+}
+footer svg{width:12px;height:12px;fill:none;stroke:var(--red);stroke-width:2}
+
+/* موبايل تحسينات إضافية */
+@media (max-width: 550px){
+  .features-grid{grid-template-columns:1fr}
+  .cd-box{min-width:60px;padding:0.5rem}
+  .cd-num{font-size:1.4rem}
+  .cta-btn{padding:0.7rem 1.8rem;font-size:0.9rem}
+  .test-grid{grid-template-columns:1fr}
+  header{padding:1.5rem 1rem 1rem}
+  .price-sec{padding:1rem 1rem 0.5rem}
+  .new-price{font-size:3rem}
+}
+</style>
+</head>
+<body>
+<canvas id="bg"></canvas>
+<div class="page">
+
+<!-- HEADER -->
+<header>
+  <div class="logo-icon">
+    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="url(#g1)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <defs><linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#ff2d55"/><stop offset="100%" stop-color="#7c3aed"/></linearGradient></defs>
+      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+      <path d="M9 12l2 2 4-4"/>
+    </svg>
+  </div>
+  <h1>VIP CLUB — محتوى حصري للكبار 🔞</h1>
+  <p>أقوى وأندر المقاطع الحصرية — بجودة 4K</p>
+</header>
+
+<!-- PRICE -->
+<section class="price-sec">
+  <p class="old-price">$49.99</p>
+  <p class="new-price">$5</p>
+  <p class="price-note">🔥 عرض لا يفوت — خصم 90% لفترة محدودة 🔥</p>
+</section>
+
+<!-- COUNTDOWN -->
+<div class="countdown">
+  <div class="cd-box"><div class="cd-num" id="days">30</div><div class="cd-label">يوم</div></div>
+  <div class="cd-box"><div class="cd-num" id="hours">00</div><div class="cd-label">ساعة</div></div>
+  <div class="cd-box"><div class="cd-num" id="minutes">00</div><div class="cd-label">دقيقة</div></div>
+  <div class="cd-box"><div class="cd-num" id="seconds">00</div><div class="cd-label">ثانية</div></div>
+</div>
+
+<!-- FEATURES -->
+<section class="features">
+  <h2>🔞 المحتوى الذي تحصل عليه 🔞</h2>
+  <div class="features-grid">
+
+    <div class="feat-card">
+      <div class="feat-icon"><svg viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg></div>
+      <div><div class="feat-label">أفلام حصرية 4K</div><div class="feat-sub">مقاطع نادرة يومياً</div></div>
+    </div>
+
+    <div class="feat-card">
+      <div class="feat-icon" style="background:linear-gradient(135deg,#b45309,#f59e0b)"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
+      <div><div class="feat-label">قنوات VIP مغلقة</div><div class="feat-sub">أشهر القنوات المدفوعة</div></div>
+    </div>
+
+    <div class="feat-card">
+      <div class="feat-icon" style="background:linear-gradient(135deg,#065f46,#10b981)"><svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg></div>
+      <div><div class="feat-label">ميقا عربي</div><div class="feat-sub">أرشيف عربي كامل</div></div>
+    </div>
+
+    <div class="feat-card">
+      <div class="feat-icon" style="background:linear-gradient(135deg,#0369a1,#0ea5e9)"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div>
+      <div><div class="feat-label">ميقا أجنبي</div><div class="feat-sub">أرشيف أجنبي حصري</div></div>
+    </div>
+
+    <div class="feat-card">
+      <div class="feat-icon" style="background:linear-gradient(135deg,#7c3aed,#a78bfa)"><svg viewBox="0 0 24 24"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg></div>
+      <div><div class="feat-label">صغار</div><div class="feat-sub">قنوات منوعة للأطفال</div></div>
+    </div>
+
+    <div class="feat-card">
+      <div class="feat-icon" style="background:linear-gradient(135deg,#9f1239,#f43f5e)"><svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
+      <div><div class="feat-label">كبار 🔞</div><div class="feat-sub">محتوى مخصص للكبار فقط</div></div>
+    </div>
+
+    <div class="feat-card">
+      <div class="feat-icon" style="background:linear-gradient(135deg,#92400e,#f59e0b)"><svg viewBox="0 0 24 24"><path d="M12 2l2 7h7l-5.5 4 2 7L12 16l-5.5 4 2-7L3 9h7z"/></svg></div>
+      <div><div class="feat-label">خليجي حصري</div><div class="feat-sub">أفلام ومسلسلات خليجية</div></div>
+    </div>
+
+    <div class="feat-card">
+      <div class="feat-icon" style="background:linear-gradient(135deg,#0f172a,#334155)"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg></div>
+      <div><div class="feat-label">مميز</div><div class="feat-sub">أندر المحتويات</div></div>
+    </div>
+
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-sec">
+  <a href="payment.html" class="cta-btn">
+    <svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+    🔞 اشترك الآن — فقط $5 🔞
+    <svg viewBox="0 0 24 24"><polyline points="13 17 18 12 13 7"/><polyline points="6 17 11 12 6 7"/></svg>
+  </a>
+</section>
+
+<!-- BADGES -->
+<div class="badges">
+  <div class="badge"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>SSL 256-bit</div>
+  <div class="badge"><svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Visa & Mastercard</div>
+  <div class="badge"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>وصول مجهول</div>
+</div>
+
+<!-- TESTIMONIALS -->
+<section class="testimonials">
+  <h2>💬 آراء المشتركين 💬</h2>
+  <div class="test-grid">
+    <div class="test-card"><div class="stars"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div><p class="test-text">"والله انه ثقة! المحتوى رهيب وكل يوم فيه شي جديد. أنصح فيه وبقوة 👌🔥"</p><p class="test-name"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>أبو عبدالله</p></div>
+    <div class="test-card"><div class="stars"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div><p class="test-text">"أشكرك على الثقة والجودة العالية. المحتوى الخليجي الحصير شيء خرافي 🔞"</p><p class="test-name"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Faisal99</p></div>
+    <div class="test-card"><div class="stars"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div><p class="test-text">"والله انك الارخص والافضل. جربت أكثر من موقع وما لقيت مثل جودة المحتوى عندكم ❤️"</p><p class="test-name"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>محمد الكويتي</p></div>
+    <div class="test-card"><div class="stars"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div><p class="test-text">"المحتوى العربي والأجنبي متكامل. أندر المقاطع الحصرية موجودة هنا 🔞👏"</p><p class="test-name"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>علي المصري</p></div>
+  </div>
+</section>
+
+<footer>
+  <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+  🔞 محتوى للكبار فقط — التسجيل آمن ومجاني 🔞
+</footer>
+
+</div>
+
+<script>
+/* ── PARTICLE NETWORK BACKGROUND ── */
+(function(){
+  var c=document.getElementById('bg'),ctx=c.getContext('2d');
+  var W,H,dots=[];
+  function resize(){W=c.width=window.innerWidth;H=c.height=window.innerHeight}
+  resize();window.addEventListener('resize',resize);
+  for(var i=0;i<70;i++){
+    dots.push({x:Math.random()*W,y:Math.random()*H,
+      vx:(Math.random()-.5)*.3,vy:(Math.random()-.5)*.3,
+      r:Math.random()*2+1})
+  }
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    for(var i=0;i<dots.length;i++){
+      var d=dots[i];d.x+=d.vx;d.y+=d.vy;
+      if(d.x<0||d.x>W)d.vx*=-1;
+      if(d.y<0||d.y>H)d.vy*=-1;
+      ctx.beginPath();ctx.arc(d.x,d.y,d.r,0,Math.PI*2);
+      ctx.fillStyle='rgba(255,45,85,.6)';ctx.fill();
+      for(var j=i+1;j<dots.length;j++){
+        var d2=dots[j],dx=d.x-d2.x,dy=d.y-d2.y,dist=Math.sqrt(dx*dx+dy*dy);
+        if(dist<120){
+          var a=1-dist/120;
+          ctx.beginPath();ctx.moveTo(d.x,d.y);ctx.lineTo(d2.x,d2.y);
+          ctx.strokeStyle='rgba(255,45,85,'+a*.2+')';ctx.lineWidth=.5;ctx.stroke();
+        }
+      }
+    }
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+/* ── COUNTDOWN 30 DAYS ── */
+(function(){
+  var KEY='ct_target';
+  var stored=localStorage.getItem(KEY);
+  var target=stored?parseInt(stored,10):Date.now()+30*24*60*60*1000;
+  if(!stored)localStorage.setItem(KEY,target);
+  function pad(n){return String(n).padStart(2,'0')}
+  function tick(){
+    var diff=Math.max(0,target-Date.now());
+    document.getElementById('days').textContent=pad(Math.floor(diff/86400000));
+    document.getElementById('hours').textContent=pad(Math.floor((diff/3600000)%24));
+    document.getElementById('minutes').textContent=pad(Math.floor((diff/60000)%60));
+    document.getElementById('seconds').textContent=pad(Math.floor((diff/1000)%60));
+  }
+  tick();setInterval(tick,1000);
+})();
+</script>
+</body>
+</html>
